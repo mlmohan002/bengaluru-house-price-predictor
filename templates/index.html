@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bengaluru House Price Predictor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+      --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+      --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+      --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+      --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+      --text-2xl: clamp(2rem, 1.2rem + 2.5vw, 3.5rem);
+      --space-2: 0.5rem; --space-3: 0.75rem; --space-4: 1rem; --space-5: 1.25rem;
+      --space-6: 1.5rem; --space-8: 2rem; --space-10: 2.5rem; --space-12: 3rem; --space-16: 4rem;
+      --radius-md: 0.75rem; --radius-lg: 1rem; --radius-xl: 1.25rem;
+      --font-body: 'Instrument Sans', system-ui, sans-serif;
+      --font-display: 'DM Serif Display', Georgia, serif;
+      --color-bg: #f7f6f2; --color-surface: #ffffff; --color-surface-2: #f3f0ec;
+      --color-border: #ddd8d0; --color-text: #232018; --color-text-muted: #6f6b63;
+      --color-primary: #01696f; --color-primary-hover: #0c4e54; --color-primary-soft: #dcebea;
+      --shadow-sm: 0 8px 24px rgba(34, 31, 24, 0.06);
+      --shadow-lg: 0 18px 48px rgba(34, 31, 24, 0.12);
+    }
+    [data-theme="dark"] {
+      --color-bg: #151412; --color-surface: #1e1c19; --color-surface-2: #252320;
+      --color-border: #37332d; --color-text: #f2ede5; --color-text-muted: #b2aba1;
+      --color-primary: #58a4ab; --color-primary-hover: #78b8be; --color-primary-soft: #22373a;
+      --shadow-sm: 0 8px 24px rgba(0,0,0,0.25);
+      --shadow-lg: 0 18px 48px rgba(0,0,0,0.35);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh; font-family: var(--font-body); font-size: var(--text-base);
+      line-height: 1.6; color: var(--color-text); background:
+      radial-gradient(circle at top right, var(--color-primary-soft), transparent 28%), var(--color-bg);
+    }
+    .container { width: min(1120px, calc(100% - 2rem)); margin: 0 auto; }
+    .topbar {
+      display: flex; justify-content: space-between; align-items: center; padding: var(--space-6) 0;
+    }
+    .brand { display: flex; align-items: center; gap: var(--space-3); font-weight: 700; }
+    .logo {
+      width: 42px; height: 42px; border-radius: 14px; background: var(--color-primary);
+      color: white; display: grid; place-items: center; box-shadow: var(--shadow-sm);
+    }
+    .toggle {
+      border: 1px solid var(--color-border); background: var(--color-surface); color: var(--color-text);
+      border-radius: 999px; padding: 0.7rem 1rem; cursor: pointer;
+    }
+    .hero {
+      display: grid; grid-template-columns: 1.1fr 0.9fr; gap: var(--space-12); align-items: center;
+      padding: var(--space-8) 0 var(--space-16);
+    }
+    .eyebrow {
+      display: inline-block; margin-bottom: var(--space-4); background: var(--color-primary-soft);
+      color: var(--color-primary); padding: 0.4rem 0.8rem; border-radius: 999px; font-size: var(--text-sm); font-weight: 600;
+    }
+    h1 {
+      font-family: var(--font-display); font-size: var(--text-2xl); line-height: 1.05; letter-spacing: -0.03em;
+      max-width: 12ch; margin-bottom: var(--space-5);
+    }
+    .lead { color: var(--color-text-muted); max-width: 58ch; margin-bottom: var(--space-8); }
+    .stats { display: flex; gap: var(--space-4); flex-wrap: wrap; }
+    .stat {
+      background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+      padding: var(--space-4) var(--space-5); min-width: 150px; box-shadow: var(--shadow-sm);
+    }
+    .stat strong { display: block; font-size: var(--text-lg); }
+    .card {
+      background: color-mix(in srgb, var(--color-surface) 86%, transparent);
+      backdrop-filter: blur(10px); border: 1px solid var(--color-border); border-radius: var(--radius-xl);
+      padding: var(--space-8); box-shadow: var(--shadow-lg);
+    }
+    .card h2 { font-size: var(--text-xl); margin-bottom: var(--space-2); }
+    .card p { color: var(--color-text-muted); margin-bottom: var(--space-6); }
+    form { display: grid; gap: var(--space-5); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+    .field { display: flex; flex-direction: column; gap: 0.5rem; }
+    label { font-size: var(--text-sm); font-weight: 600; }
+    input, select {
+      width: 100%; padding: 0.95rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--color-border);
+      background: var(--color-surface); color: var(--color-text); font: inherit;
+    }
+    input:focus, select:focus { outline: 2px solid var(--color-primary); outline-offset: 2px; }
+    .btn {
+      background: var(--color-primary); color: #fff; border: none; padding: 1rem 1.2rem; border-radius: var(--radius-md);
+      font-weight: 700; cursor: pointer; transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .btn:hover { background: var(--color-primary-hover); transform: translateY(-1px); }
+    .prediction {
+      margin-top: var(--space-6); padding: var(--space-5); border-radius: var(--radius-lg);
+      background: var(--color-primary-soft); border: 1px solid color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
+    }
+    .prediction span { display: block; color: var(--color-text-muted); font-size: var(--text-sm); margin-bottom: 0.35rem; }
+    .prediction strong { font-size: var(--text-xl); color: var(--color-primary); }
+    .footer { padding: 0 0 var(--space-10); color: var(--color-text-muted); font-size: var(--text-sm); }
+    @media (max-width: 900px) {
+      .hero, .grid { grid-template-columns: 1fr; }
+      h1 { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 18L12 6L20 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M8.5 18V13.5H15.5V18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div>
+          <div>Bengaluru House Price Predictor</div>
+        </div>
+      </div>
+      <button class="toggle" type="button" data-theme-toggle aria-label="Switch theme">Theme</button>
+    </header>
+
+    <main class="hero">
+      <section>
+        <span class="eyebrow">ML-based property estimate</span>
+        <h1>Check an estimated house price in Bengaluru.</h1>
+        <p class="lead">Choose a location, enter square feet, bathrooms, and BHK count, then get a model-based price prediction from your Flask app.</p>
+        <div class="stats">
+          <div class="stat"><strong>300+</strong><span>Supported locations</span></div>
+          <div class="stat"><strong>4 inputs</strong><span>Simple prediction form</span></div>
+          <div class="stat"><strong>Instant</strong><span>Estimate on submit</span></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Enter property details</h2>
+        <p>Fill the values below to generate an estimated price.</p>
+
+        <form action="/predict" method="POST">
+          <div class="field">
+            <label for="location">Location</label>
+            <select id="location" name="location" required>
+              <option value="" disabled selected>Select a Bengaluru location</option>
+              {% for location in locations %}
+              <option value="{{ location }}">{{ location }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="sqft">Total Square Feet</label>
+              <input id="sqft" name="sqft" type="number" step="any" min="100" placeholder="e.g. 1200" required>
+            </div>
+            <div class="field">
+              <label for="bhk">BHK</label>
+              <input id="bhk" name="bhk" type="number" min="1" placeholder="e.g. 2" required>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="bath">Bathrooms</label>
+            <input id="bath" name="bath" type="number" step="any" min="1" placeholder="e.g. 2" required>
+          </div>
+
+          <button class="btn" type="submit">Predict Price</button>
+        </form>
+
+        {% if prediction %}
+        <div class="prediction">
+          <span>Estimated price</span>
+          <strong>₹ {{ prediction }} lakhs</strong>
+        </div>
+        {% endif %}
+      </section>
+    </main>
+
+    <footer class="footer">
+      Built for the uploaded Flask prediction app using the locations list passed into the template.
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const root = document.documentElement;
+      const button = document.querySelector('[data-theme-toggle]');
+      let theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      root.setAttribute('data-theme', theme);
+      button.addEventListener('click', function () {
+        theme = theme === 'dark' ? 'light' : 'dark';
+        root.setAttribute('data-theme', theme);
+      });
+    })();
+  </script>
+</body>
+</html>
