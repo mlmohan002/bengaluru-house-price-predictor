@@ -5,9 +5,9 @@ import json
 
 app = Flask(__name__)
 
-# Load once during startup
-with open("RidgeModel.pkl", "rb") as model_file:
-    model = pickle.load(model_file)
+# Load once at startup (important for speed)
+with open("RidgeModel.pkl", "rb") as f:
+    model = pickle.load(f)
 
 with open("locations.json", "r") as f:
     locations = json.load(f)
@@ -16,41 +16,35 @@ with open("locations.json", "r") as f:
 def home():
     return render_template("index.html", locations=locations)
 
-@app.route("/health")
-def health():
-    return "OK", 200
-
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        location = request.form["location"]
-        sqft = float(request.form["sqft"])
-        bath = float(request.form["bath"])
-        bhk = int(request.form["bhk"])
+        # Faster input capture
+        location = request.form.get("location")
+        sqft = float(request.form.get("total_sqft"))
+        bath = float(request.form.get("bath"))
+        bhk = int(request.form.get("bhk"))
 
-        input_data = {
-            "location": [location],
-            "total_sqft": [sqft],
-            "bath": [bath],
-            "bhk": [bhk]
-        }
+        # Fast dataframe
+        input_data = pd.DataFrame(
+            [[location, sqft, bath, bhk]],
+            columns=["location", "total_sqft", "bath", "bhk"]
+        )
 
-        input_df = pd.DataFrame(input_data)
-
-        prediction = round(model.predict(input_df)[0], 2)
+        prediction = round(model.predict(input_data)[0], 2)
 
         return render_template(
             "index.html",
             locations=locations,
-            prediction=prediction
+            prediction_text=f"Estimated Price: ₹ {prediction} Lakhs"
         )
 
     except Exception as e:
         return render_template(
             "index.html",
             locations=locations,
-            prediction=f"Error: {str(e)}"
+            prediction_text=f"Error: {str(e)}"
         )
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(debug=False)
